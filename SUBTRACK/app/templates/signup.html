@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+</head>
+<body>
+
+<div class="background-overlay" style="background-image: url({% static 'images/hpimage.avif' %});"></div>
+
+<div class="signup-box glass-panel p-8">
+    <h2>Sign Up</h2>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form id="signupForm" action="{% url 'signup' %}" method="post">
+        {% csrf_token %}
+
+        <label>Name</label>
+        <input type="text" name="name" required>
+
+        <label>Email</label>
+        <input type="email" name="email" required>
+
+        <label>Password</label>
+        <div class="password-wrapper">
+            <input type="password" id="password" name="password" required>
+            <span class="toggle" onclick="togglePass('password', this)">🙈</span>
+        </div>
+
+        <label>Re-enter Password</label>
+        <div class="password-wrapper">
+            <input type="password" id="confirmPassword" name="confirm_password" required>
+            <span class="toggle" onclick="togglePass('confirmPassword', this)">🙈</span>
+        </div>
+
+        <small id="passwordError" class="error-text"></small>
+
+        <button type="submit" class="btn btn-primary">Create Account</button>
+    </form>
+
+    
+
+</div>
+
+<script src="{% static 'js/signup.js' %}"></script>
+</body>
+</html>

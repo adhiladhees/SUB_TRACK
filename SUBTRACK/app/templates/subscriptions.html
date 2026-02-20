@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscriptions</title>
+    <link rel="stylesheet" href="{% static 'css/subscriptions.css' %}">
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+</head>
+<body>
+
+<div class="background-overlay" style="background-image: url({% static 'images/hpimage.aavif' %});"></div>
+
+<div class="navbar glass-panel">
+    <h2>SubTrack</h2>
+    <div class="menu">
+        <button onclick="location.href='{% url 'dashboard' %}'">Dashboard</button>
+        <button class="active" onclick="location.href='{% url 'subscriptions' %}'">Subscriptions</button>
+        <button onclick="location.href='{% url 'analytics' %}'">Analytics</button>
+        <button onclick="location.href='{% url 'settings' %}'">Settings</button>
+        <button id="acc" onclick="toggleDropdown()">
+            {{ user.first_name|default:user.email|slice:":1"|upper }}
+        </button>
+    </div>
+
+    <div id="dropdown" class="dropdown">
+        <p>{{ user.email }}</p>
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+</div>
+
+<div class="container glass-panel p-6">
+    <h1>Subscriptions</h1>
+
+    <div class="subscription-info">
+        <h3>Total Subscriptions: <span>{{ subscriptions|length }}</span></h3>
+    </div>
+
+    {% if subscriptions %}
+    <div class="subscriptions-grid">
+        {% for sub in subscriptions %}
+            <div class="subscription-card">
+                <h3>{{ sub.service_name }}</h3>
+                <p><strong>Plan:</strong> {{ sub.plan }}</p>
+                <p><strong>Amount:</strong> ₹{{ sub.amount }}</p>
+                <p><strong>Billing Cycle:</strong> {{ sub.billing_cycle }}</p>
+                <p><strong>Renewal Date:</strong>
+                    {% if sub.renewal_date %}
+                        {{ sub.renewal_date }}
+                    {% else %}
+                        Not set
+                    {% endif %}
+             </p>
+            </div>
+    {% endfor %}
+
+
+    </div>
+
+    {% else %}
+        <p>No subscriptions found.</p>
+    {% endif %}
+</div>
+
+<script src="{% static 'js/subscriptions.js' %}"></script>
+<script>
+    {% if alerts %}
+    function showAlerts() {
+        var now = new Date().getTime();
+        var lastAlertTime = localStorage.getItem('lastAlertTime');
+        
+        // Check if 1 hour (3600000 ms) has passed since last alert
+        if (!lastAlertTime || (now - lastAlertTime) >= 3600000) {
+            {% for alert in alerts %}
+                {% if alert.type == 'trial' %}
+                    alert('⚠️ Trial Expiring Soon!\n\nYour {{ alert.service }} trial expires in {{ alert.hours }} hour{{ alert.hours|pluralize }} ({{ alert.date }})');
+                {% elif alert.type == 'renewal' %}
+                    alert('🔔 Renewal Reminder!\n\n{{ alert.service }} renews in {{ alert.hours }} hour{{ alert.hours|pluralize }} ({{ alert.date }})\nAmount: ₹{{ alert.amount }}');
+                {% endif %}
+            {% endfor %}
+            
+            // Store current time as last alert time
+            localStorage.setItem('lastAlertTime', now);
+        }
+    }
+    
+    // Show alerts on page load (if 1 hour has passed)
+    showAlerts();
+    
+    // Check every minute if it's time to show alert again
+    setInterval(showAlerts, 60000);
+    {% endif %}
+
+    function toggleDropdown() {
+        document.getElementById('dropdown').classList.toggle('show');
+    }
+</script>
+
+
+</body>
+</html>

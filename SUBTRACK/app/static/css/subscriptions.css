@@ -1,0 +1,347 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #111;
+    color: white;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 60px auto 0;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.subscription-info {
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 30px;
+}
+
+.subscription-info p {
+    font-size: 18px;
+}
+
+.subscription-info span {
+    color: #00bcd4;
+    font-weight: bold;
+}
+
+/* NAVBAR */
+
+.navbar {
+    background-color: #1a1a1a;
+    margin: 10px;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu button {
+    margin-right: 10px;
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 6px 20px;
+    cursor: pointer;
+    border-radius: 15px;
+    font-size: 14px;
+}
+
+.menu button:hover {
+    background-color: #00bcd4;
+    color: white;
+}
+
+.menu button.active {
+    background-color: #00bcd4;
+    color: black;
+    box-shadow: 0 0 15px rgba(0, 173, 235, 0.8);
+}
+
+#acc {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background-color: #00bcd4;
+    color: black;
+    border-radius: 50%;
+}
+
+/* DROPDOWN */
+
+.dropdown {
+    a{
+        color: aqua;
+    }
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    background-color: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 10px;
+    display: none;
+    z-index: 1000;
+}
+
+.dropdown.show {
+    display: block;
+}
+
+/* GRID */
+
+.subscriptions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.subscription-card {
+    background: #1e1e1e;
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+    position: relative;
+}
+
+.card-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    border: none;
+    border-radius: 12px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.action-btn.edit {
+    background: #00bcd4;
+    color: #111;
+}
+
+.action-btn.delete {
+    background: #b33939;
+    color: #fff;
+}
+
+.action-btn:hover {
+    opacity: 0.9;
+}
+
+.subscription-card h3 {
+    margin-bottom: 12px;
+    font-size: 18px;
+    padding-right: 110px;
+}
+
+.subscription-card p {
+    margin: 6px 0;
+    font-size: 14px;
+}
+
+.type {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: white;
+}
+
+.type.free { background: #6c757d; }
+.type.trial { background: #f0ad4e; }
+.type.paid { background: #28a745; }
+
+/* Edit modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(4px);
+    z-index: 99999;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-box {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    margin: 16px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #2e2e2e;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #00bcd4;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.modal-close:hover {
+    color: #fff;
+    background: #333;
+}
+
+.modal-body {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 13px;
+    color: #ccc;
+}
+
+.form-group input,
+.form-group select {
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    color: #fff;
+    padding: 10px 12px;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #00bcd4;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px 20px;
+    border-top: 1px solid #2e2e2e;
+}
+
+.btn-cancel,
+.btn-submit {
+    border: none;
+    border-radius: 20px;
+    padding: 9px 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-cancel {
+    background: #2e2e2e;
+    color: #ccc;
+}
+
+.btn-submit {
+    background: #00bcd4;
+    color: #111;
+    font-weight: bold;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .subscriptions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+/* Mobile */
+@media (max-width: 600px) {
+    .subscriptions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 24px;
+        text-align: center;
+    }
+
+    .container {
+        padding: 20px 16px;   /* left-right spacing */
+        margin: 60px auto 0;
+    }
+}
+
+/*tablet*/
+@media (max-width: 900px) {
+    .menu {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 600px) {
+
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .menu {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* Make normal buttons flexible */
+    .menu button:not(#acc) {
+        flex: 1;
+        text-align: center;
+    }
+
+    /* Keep profile circle fixed */
+    #acc {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        align-self: flex-end;
+    }
+}

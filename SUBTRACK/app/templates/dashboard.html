@@ -1,0 +1,249 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | SubTrack</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+    <style>
+        #subscriptionModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+        }
+        #subscriptionModal.open {
+            display: flex;
+        }
+        .modal-box {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            width: 480px;
+            max-width: calc(100vw - 32px);
+            box-shadow: 0 0 50px rgba(0,188,212,0.2);
+            animation: popIn 0.2s ease;
+        }
+        @keyframes popIn {
+            from { opacity:0; transform: scale(0.93) translateY(-16px); }
+            to   { opacity:1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid #2e2e2e;
+        }
+        .modal-header h2 { margin:0; font-size:1.1rem; color:#00bcd4; }
+        .modal-close {
+            background: none; border: none; color: #aaa;
+            font-size: 20px; cursor: pointer;
+            padding: 2px 8px; border-radius: 4px; line-height:1;
+        }
+        .modal-close:hover { background:#333; color:#fff; }
+        .modal-body {
+            padding: 18px 22px;
+            display: flex; flex-direction: column; gap: 14px;
+        }
+        .form-group { display:flex; flex-direction:column; gap:5px; }
+        .form-group label { font-size:13px; color:#ccc; }
+        .form-group label span { color:#00bcd4; }
+        .form-group input,
+        .form-group select {
+            background:#2a2a2a; border:1px solid #3a3a3a;
+            border-radius:6px; color:#fff;
+            padding:9px 12px; font-size:14px; outline:none;
+            width:100%; box-sizing:border-box;
+        }
+        .form-group input:focus,
+        .form-group select:focus { border-color:#00bcd4; box-shadow:0 0 0 2px rgba(0,188,212,0.15); }
+        .form-group input::placeholder { color:#555; }
+        .form-group select option { background:#2a2a2a; }
+        .form-group input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor:pointer; }
+        .modal-footer {
+            display:flex; justify-content:flex-end; gap:10px;
+            padding:14px 22px 18px; border-top:1px solid #2e2e2e;
+        }
+        .btn-cancel {
+            background:#2e2e2e; color:#ccc; border:none;
+            padding:9px 18px; border-radius:20px; cursor:pointer; font-size:14px;
+        }
+        .btn-cancel:hover { background:#3a3a3a; color:#fff; }
+        .btn-submit {
+            background:#00bcd4; color:#000; border:none;
+            padding:9px 20px; border-radius:20px;
+            cursor:pointer; font-size:14px; font-weight:bold;
+        }
+        .btn-submit:hover { background:#00e5ff; }
+    </style>
+</head>
+<body>
+    <div class="background-overlay" style="background-image: url({% static 'images/hpimage4.1.jpeag' %});"></div>
+
+    <div class="navbar glass-panel">
+        <h2>SubTrack</h2>
+        <div class="menu">
+            <button class="active" onclick="location.href='{% url 'dashboard' %}'">Dashboard</button>
+            <button onclick="location.href='{% url 'subscriptions' %}'">Subscriptions</button>
+            <button onclick="location.href='{% url 'analytics' %}'">Analytics</button>
+            <button onclick="location.href='{% url 'settings' %}'">Settings</button>
+            <button id="acc" onclick="toggleDropdown()">
+                {{ user.email|slice:":1"|upper }}
+            </button>
+        </div>
+        <div id="dropdown" class="dropdown">
+            <p>{{ user.email }}</p>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+
+    <div class="container glass-panel p-6">
+        <h1 class="text-gradient">Welcome, {{ display_name }}</h1>
+        <p>Total Subscriptions: <strong>{{ total_subscriptions }}</strong></p>
+
+        <div class="box">
+            <p><strong>Gmail Status</strong></p>
+            <p><strong>Total emails scanned:</strong> {{ gmail_count }}</p>
+            <p>
+                <strong>Last Scan:</strong>
+                {% if last_scan %}{{ last_scan }}{% else %}Not scanned yet{% endif %}
+            </p>
+            <button class="btn" onclick="location.href='{% url 'scan_emails' %}'">Scan Emails</button>
+        </div>
+
+        <div class="row">
+            <div class="box">
+                <p>Total spending this month</p>
+                <h2>₹{{ monthly_spend }}</h2>
+            </div>
+            <div class="box">
+                <p>Upcoming Renewals</p>
+                {% if next_renewal %}
+                    <h2>{{ next_renewal.service_name }}</h2>
+                    <p><strong>Next Renewal Date:</strong> {{ next_renewal.renewal_date }}</p>
+                {% else %}
+                    <h2>No upcoming renewal</h2>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="box">
+            <h3>Still cannot find your subscription?</h3>
+            <p>Add it manually.</p>
+            <button class="btn" onclick="openModal()">Add Subscription</button>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="subscriptionModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>Add Subscription</h2>
+                <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+            </div>
+            <form method="post" action="{% url 'add_subscription' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Service Name <span>*</span></label>
+                        <input type="text" id="serviceName" name="service_name" placeholder="e.g., Netflix, Spotify, Adobe" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Billing Cycle <span>*</span></label>
+                        <select id="billingCycle" name="billing_cycle" required>
+                            <option value="" disabled selected>Select billing cycle</option>
+                            <option value="Monthly">Monthly</option>
+                            <option value="Yearly">Yearly</option>
+                            <option value="One-time">One-time</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Next Renewal Date <span>*</span></label>
+                        <input type="date" id="renewalDate" name="renewal_date" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Amount (Rs.)</label>
+                        <input type="number" id="amount" name="amount" placeholder="e.g., 199" min="0" step="0.01" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-submit">Add Subscription</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('subscriptionModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('subscriptionModal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // Close when clicking the dark backdrop
+        document.getElementById('subscriptionModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Dropdown
+        function toggleDropdown() {
+            document.getElementById('dropdown').classList.toggle('show');
+        }
+        document.addEventListener('click', function(e) {
+            if (!e.target.matches('#acc')) {
+                var d = document.getElementById('dropdown');
+                if (d.classList.contains('show')) d.classList.remove('show');
+            }
+        });
+
+        {% if show_alert and next_renewal %}
+        alert('🔔 Renewal Reminder!\n\n{{ next_renewal.service_name|escapejs }} renews on {{ next_renewal.renewal_date|date:"d-m-Y" }}');
+        {% endif %}
+
+        // Alert system for reminders
+        {% if alerts %}
+        function showAlerts() {
+            var now = new Date().getTime();
+            var lastAlertTime = localStorage.getItem('lastAlertTime');
+            
+            // Check if 1 hour (3600000 ms) has passed since last alert
+            if (!lastAlertTime || (now - lastAlertTime) >= 3600000) {
+                {% for alert in alerts %}
+                    {% if alert.type == 'trial' %}
+                        alert('⚠️ Trial Expiring Soon!\n\nYour {{ alert.service }} trial expires in {{ alert.hours }} hour{{ alert.hours|pluralize }} ({{ alert.date }})');
+                    {% elif alert.type == 'renewal' %}
+                        alert('🔔 Renewal Reminder!\n\n{{ alert.service }} renews in {{ alert.hours }} hour{{ alert.hours|pluralize }} ({{ alert.date }})\nAmount: ₹{{ alert.amount }}');
+                    {% endif %}
+                {% endfor %}
+                
+                // Store current time as last alert time
+                localStorage.setItem('lastAlertTime', now);
+            }
+        }
+        
+        // Show alerts on page load (if 1 hour has passed)
+        showAlerts();
+        
+        // Check every minute if it's time to show alert again
+        setInterval(showAlerts, 60000);
+        {% endif %}
+    </script>
+</body>
+</html>

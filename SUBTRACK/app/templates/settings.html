@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="{% static 'css/settings.css' %}">
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+</head>
+<body>
+
+<div class="background-overlay" style="background-image: url({% static 'images/hpimage.avaif' %});"></div>
+
+<div class="navbar glass-panel">
+    <h2>SubTrack</h2>
+    <div class="menu">
+        <button onclick="location.href='{% url 'dashboard' %}'">Dashboard</button>
+        <button onclick="location.href='{% url 'subscriptions' %}'">Subscriptions</button>
+        <button onclick="location.href='{% url 'analytics' %}'">Analytics</button>
+        <button class="active" onclick="location.href='{% url 'settings' %}'">Settings</button>
+        <button id="acc" onclick="toggleDropdown()">
+            {{ user.first_name|default:user.email|slice:":1"|upper }}
+        </button>
+    </div>
+
+    <div id="dropdown" class="dropdown">
+        <p>{{ user.email }}</p>
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+</div>
+
+<h1 class="settings">Settings</h1>
+
+<div class="settings-wrapper">
+
+    <div class="container glass-panel p-6">
+        <h2>Account</h2>
+
+        <div class="setting-item">
+            <span>{{ user.email }}</span>
+            <button class="logout-btn" onclick="location.href='{% url 'logout' %}'">Log Out</button>
+        </div>
+
+       <form method="POST">
+            {% csrf_token %}
+            <div class="setting-item">
+                <span>Renewal Reminder</span>
+                <label class="switch">
+                    <input type="checkbox" name="renewal_reminder"
+                        {% if renewal_reminder %}checked{% endif %}
+                        onchange="this.form.submit()">
+                <span class="slider"></span>
+                </label>
+            </div>
+        </form>
+
+        
+    
+    </div>
+
+    <div class="about">
+        <h2 class="abt">About</h2>
+        <div class="content-display">
+            <p>
+                Our platform is designed to simplify how users manage their digital subscriptions by turning scattered email notifications into clear, actionable insights. By securely analyzing recent subscription-related emails, the system automatically identifies active services, renewal dates, and billing details, and organizes everything into a single, easy-to-use dashboard. This approach helps users stay informed, avoid missed renewals, and reduce unnecessary spending without the need for manual tracking.
+
+                Built with a strong focus on privacy, transparency, and user control, the platform uses read-only email access and allows manual entry for subscriptions that cannot be detected automatically. A modern, minimal interface with intelligent alerts and spending insights ensures that users not only see their subscriptions but also understand their impact over time.
+            </p>
+        </div>
+
+        <h2 class="abt">Team Members</h2>
+        <br>
+            <div class="content-display">
+                <ul>
+                    <li>Rishi Raj A</li>
+                    <li>Aadil Muhammad</li>
+                    <li>Fasnas A H</li>
+                    <li>Muhammed Javad K K</li>
+                    <li>Thanseer Ahmed M S</li>
+                </ul>
+        <div class="content-display"></div>
+    </div>
+
+</div>
+
+<script>
+    function toggleDropdown() {
+        document.getElementById('dropdown').classList.toggle('show');
+    }
+</script>
+
+</body>
+</html>

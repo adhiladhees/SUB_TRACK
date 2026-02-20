@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+</head>
+<body>
+
+    <div class="background-overlay" style="background-image: url({% static 'images/hpimage.avif' %});"></div>
+
+    <div class="signup-box glass-panel p-8">
+        <h2>Sign In</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+             {% if message.tags == "error" %}
+                <div class="error-message">
+                    {{ message }}
+                </div>
+             {% endif %}
+            {% endfor %}
+        {% endif %}
+
+
+        <form action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+  
+            <label>Email</label>
+            <input type="email" name="email" required>
+
+            <label>Password</label>
+            <input type="password" name="password" required>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        
+
+    </div>
+
+</body>
+</html>

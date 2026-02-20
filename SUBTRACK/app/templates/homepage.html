@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Manager</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+</head>
+<body>
+
+    <!-- Background Layer -->
+    <!-- ensure the image filename matches what you placed in static/images -->
+    <div class="background-overlay" style="background-image: url({% static 'images/hpimage4.1.jpeg' %});"></div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Take Control of Your Subscriptions</h1>
+            <p>Track, manage, and get alerts for all your email subscriptions.</p>
+
+            <div class="buttons">
+                <a href="{% url 'signup' %}" class="btn primary">Get Started</a>
+                <a href="{% url 'login' %}" class="btn secondary">Log In</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="feature-box">
+            <h3>Smart Email Scanning</h3>
+            <p>Automatically detects subscriptions from emails.</p>
+        </div>
+
+        <div class="feature-box">
+            <h3>Manual Subscription Entry</h3>
+            <p>Add subscriptions manually when needed.</p>
+        </div>
+
+        <div class="feature-box">
+            <h3>Centralized Dashboard</h3>
+            <p>View all subscriptions in one place.</p>
+        </div>
+
+        <div class="feature-box">
+            <h3>Renewal & Trial Alerts</h3>
+            <p>Get notified before renewals or trial expiry.</p>
+        </div>
+
+        <div class="feature-box">
+            <h3>Spending Overview</h3>
+            <p>Track monthly and yearly subscription costs.</p>
+        </div>
+
+        <div class="feature-box">
+            <h3>Budget Limit & Spending Alerts</h3>
+            <p>Set a budget and get notified when spending exceeds it.</p>
+        </div>
+    </section>
+
+</body>
+</html>

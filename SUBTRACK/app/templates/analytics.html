@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/analytics.css' %}">
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+</head>
+
+<body>
+<div class="background-overlay" style="background-image: url({% static 'images/hpimage.aavif' %});"></div>
+<div class="navbar glass-panel">
+    <h2>SubTrack</h2>
+    <div class="menu">
+        <button onclick="location.href='{% url 'dashboard' %}'">Dashboard</button>
+        <button onclick="location.href='{% url 'subscriptions' %}'">Subscriptions</button>
+        <button class="active" onclick="location.href='{% url 'analytics' %}'">Analytics</button>
+        <button onclick="location.href='{% url 'settings' %}'">Settings</button>
+        <button id="acc" onclick="toggleDropdown()">
+            {{ user.first_name|default:user.email|slice:":1"|upper }}
+        </button>
+    </div>
+    <div id="dropdown" class="dropdown">
+        <p>{{ user.email }}</p>
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+</div>
+
+<div class="container glass-panel p-6">
+
+    <h1 class="text-gradient">Analytics</h1>
+    <div class="subtitle">Understand your subscription spending</div>
+
+    <div class="cards">
+        <div class="card glass-panel">
+            <div class="card-title">Total Subscriptions</div>
+            <div class="amount">{{ total_subscriptions }}</div>
+            <div class="small-text">Active subscriptions</div>
+        </div>
+
+        <div class="card glass-panel">
+            <div class="card-title">Monthly Spend</div>
+            <div class="amount">₹{{ monthly_spend }}</div>
+            <div class="small-text">Based on active subscriptions</div>
+        </div>
+
+        <div class="card glass-panel">
+            <div class="card-title">Yearly Estimate</div>
+            <div class="amount">₹{{ yearly_estimate }}</div>
+            <div class="small-text">Estimated yearly cost</div>
+        </div>
+
+        <div class="card glass-panel">
+            <div class="card-title">Upcoming Renewals</div>
+            <div class="amount">{{ upcoming_renewals }}</div>
+            <div class="small-text">Next 30 days</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    {% if alerts %}
+    function showAlerts() {
+        var now = new Date().getTime();
+        var lastAlertTime = localStorage.getItem('lastAlertTime');
+        
+        // Check if 1 hour (3600000 ms) has passed since last alert
+        if (!lastAlertTime || (now - lastAlertTime) >= 3600000) {
+            {% for alert in alerts %}
+                {% if alert.type == 'trial' %}
+                    alert('⚠️ Trial Expiring Soon!\n\nYour {{ alert.service }} trial expires in {{ alert.hours }} hour{{ alert.hours|pluralize }} ({{ alert.date }})');
+                {% elif alert.type == 'renewal' %}
+                    alert('🔔 Renewal Reminder!\n\n{{ alert.service }} renews in {{ alert.hours }} hour{{ alert.hours|pluralize }} ({{ alert.date }})\nAmount: ₹{{ alert.amount }}');
+                {% endif %}
+            {% endfor %}
+            
+            // Store current time as last alert time
+            localStorage.setItem('lastAlertTime', now);
+        }
+    }
+    
+    // Show alerts on page load (if 1 hour has passed)
+    showAlerts();
+    
+    // Check every minute if it's time to show alert again
+    setInterval(showAlerts, 60000);
+    {% endif %}
+
+    function toggleDropdown() {
+        document.getElementById('dropdown').classList.toggle('show');
+    }
+</script>
+
+</body>
+</html>
